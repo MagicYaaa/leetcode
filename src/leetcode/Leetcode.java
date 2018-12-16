@@ -10,6 +10,82 @@ import java.util.*;
  **/
 public class Leetcode {
 
+    //958. 二叉树的完全性检验
+    public boolean isCompleteTree(TreeNode root) {
+
+    }
+
+
+    //957. N 天后的牢房
+    public int[] prisonAfterNDays(int[] cells, int N) {
+        if (N == 0) {
+            return cells;
+        }
+        ArrayList<int[]> list = new ArrayList<>();
+        list.add(cells);
+        int k = 1;  //k为第一天
+        while (k <= N) {
+            int[] cur = prisionStatus(list.get(k - 1));//根据昨天的状态获取今天的状态
+            list.add(cur);//将今天的状态添加至list
+            int index = findStatus(list);//循环判断list中是否存在已有状态,如果有返回下标，无返回-1
+            if (index != -1) { //如果 index != -1 ，说明找到重复 ,   ps:此处存在 ／by zero 异常
+                try {
+                    int res = (N - index) % (k - index);
+
+                    //----
+                    for (int i = 0; i <= k; i++) {
+                        System.out.print("i=" + i + "  ");
+                        printArray(list.get(i));
+                    }
+                    //----
+                    return list.get(index + res);
+                } catch (Exception e) {
+                    return list.get(index);  //存在异常的情况是 index + 1 == cur ，也就是昨天和今天状态一致，也意味着监狱状态稳定，以后不会变化。
+                }
+            }
+            k++;
+        }
+        return list.get(list.size() - 1);
+    }
+
+    //根据昨天获取当天监狱状态
+    private int[] prisionStatus(int[] pre) {
+        int[] cur = new int[pre.length];
+        cur[0] = 0;
+        cur[cur.length - 1] = 0;
+        for (int i = 1; i < pre.length - 1; i++) {
+            if (pre[i - 1] == pre[i + 1]) {
+                cur[i] = 1;
+            } else {
+                cur[i] = 0;
+            }
+        }
+        return cur;
+    }
+
+    //循环判断list中是否存在已有状态,如果有返回下标，无 返回-1
+    private int findStatus(ArrayList<int[]> list) {
+        for (int i = 0; i <= list.size() - 2; i++) {
+            if (arrayIsSame(list.get(list.size() - 1), list.get(i))) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    //判断数组是否一致
+    private boolean arrayIsSame(int[] a, int[] b) {
+        if (a.length != b.length) {
+            return false;
+        }
+        for (int i = 0; i < a.length; i++) {
+            if (a[i] != b[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     //leetcode34在排序数组中查找元素的第一个和最后一个位置
     public int[] searchRange(int[] nums, int target) {
@@ -162,5 +238,13 @@ public class Leetcode {
             }
         }
         return res;
+    }
+
+    //打印数组
+    public void printArray(int[] a) {
+        for (int i = 0; i < a.length; i++) {
+            System.out.print(a[i] + " ");
+        }
+        System.out.println();
     }
 }
